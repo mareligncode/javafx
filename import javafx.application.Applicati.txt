@@ -1,3 +1,4 @@
+package com.example.mare;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -7,14 +8,25 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class TextEditorUI extends Application {
+public class TextEditorApp extends Application {
+
+    private TextArea textArea;
+    private TextField textField;
+    private ToggleGroup colorGroup;
+    private CheckBox boldCheckBox;
+    private CheckBox italicCheckBox;
+    private ComboBox<String> styleComboBox;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Text Editor");
 
         // Create components
-        ToggleGroup colorGroup = new ToggleGroup();
+        textField = new TextField();
+        textArea = new TextArea();
+        textArea.setEditable(false);
+        colorGroup = new ToggleGroup();
+
         RadioButton redButton = new RadioButton("Red");
         redButton.setToggleGroup(colorGroup);
         RadioButton blueButton = new RadioButton("Blue");
@@ -22,37 +34,84 @@ public class TextEditorUI extends Application {
         RadioButton greenButton = new RadioButton("Green");
         greenButton.setToggleGroup(colorGroup);
 
-        CheckBox boldCheckBox = new CheckBox("Bold");
-        CheckBox italicCheckBox = new CheckBox("Italic");
+        boldCheckBox = new CheckBox("Bold");
+        italicCheckBox = new CheckBox("Italic");
 
-        TextField textField = new TextField();
-        textField.setPromptText("Enter New Text");
+        styleComboBox = new ComboBox<>();
+        styleComboBox.getItems().addAll("Bold", "Italic", "Bold & Italic", "Regular");
 
         Button processButton = new Button("Process");
+        processButton.setOnAction(event -> processText());
+
         Button clearButton = new Button("Clear");
+        clearButton.setOnAction(event -> clearFields());
 
         // Layout
-        VBox colorBox = new VBox(10, redButton, blueButton, greenButton);
-        VBox styleBox = new VBox(10, boldCheckBox, italicCheckBox);
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10));
-        gridPane.setHgap(10);
         gridPane.setVgap(10);
-        gridPane.add(textField, 0, 0);
-        gridPane.add(new Label("Select Color:"), 0, 1);
-        gridPane.add(colorBox, 0, 2);
-        gridPane.add(new Label("Select Style:"), 1, 1);
-        gridPane.add(styleBox, 1, 2);
-        gridPane.add(processButton, 0, 3);
-        gridPane.add(clearButton, 1, 3);
+        gridPane.setHgap(10);
 
+        gridPane.add(new Label("Enter New Text:"), 0, 0);
+        gridPane.add(textField, 1, 0);
+
+        gridPane.add(new Label("Select Color:"), 0, 1);
+        gridPane.add(redButton, 0, 2);
+        gridPane.add(blueButton, 0, 3);
+        gridPane.add(greenButton, 0, 4);
+
+        gridPane.add(new Label("Text Area:"), 1, 1);
+        gridPane.add(textArea, 1, 2, 1, 3);
+
+        gridPane.add(new Label("Select Style:"), 2, 1);
+        gridPane.add(boldCheckBox, 2, 2);
+        gridPane.add(italicCheckBox, 2, 3);
+        gridPane.add(styleComboBox, 2, 4);
+
+        VBox buttonBox = new VBox(10, processButton, clearButton);
+        gridPane.add(buttonBox, 0, 5, 3, 1);
+
+        // BorderPane
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(gridPane);
 
         // Scene
-        Scene scene = new Scene(borderPane, 400, 300);
+        Scene scene = new Scene(borderPane, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void processText() {
+        String inputText = textField.getText();
+        textArea.clear();
+
+        // Get selected color
+        String color = "black";
+        RadioButton selectedColor = (RadioButton) colorGroup.getSelectedToggle();
+        if (selectedColor != null) {
+            color = selectedColor.getText().toLowerCase();
+        }
+
+        // Style text
+        String style = "-fx-font-weight: normal; -fx-font-style: normal;";
+        if (boldCheckBox.isSelected() || styleComboBox.getValue() != null && styleComboBox.getValue().contains("Bold")) {
+            style = "-fx-font-weight: bold;";
+        }
+        if (italicCheckBox.isSelected() || styleComboBox.getValue() != null && styleComboBox.getValue().contains("Italic")) {
+            style += "-fx-font-style: italic;";
+        }
+
+        textArea.setStyle("-fx-text-fill: " + color + ";" + style);
+        textArea.setText(inputText);
+    }
+
+    private void clearFields() {
+        textField.clear();
+        textArea.clear();
+        colorGroup.selectToggle(null);
+        boldCheckBox.setSelected(false);
+        italicCheckBox.setSelected(false);
+        styleComboBox.setValue(null);
     }
 
     public static void main(String[] args) {
