@@ -1,4 +1,5 @@
-package com.example.mare;
+package com.example.demo2;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -6,9 +7,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-public class TextEditorApp extends Application {
+public class HelloApplication extends Application {
 
     private TextArea textArea;
     private TextField textField;
@@ -23,8 +26,10 @@ public class TextEditorApp extends Application {
 
         // Create components
         textField = new TextField();
+        textField.setPrefWidth(250); // Decrease width
         textArea = new TextArea();
         textArea.setEditable(false);
+        textArea.setPrefWidth(250); // Decrease width
         colorGroup = new ToggleGroup();
 
         RadioButton redButton = new RadioButton("Red");
@@ -48,12 +53,12 @@ public class TextEditorApp extends Application {
 
         // Layout
         GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(10));
-        gridPane.setVgap(10);
-        gridPane.setHgap(10);
+        gridPane.setPadding(new Insets(20));
+        gridPane.setVgap(15);
+        gridPane.setHgap(15);
 
         gridPane.add(new Label("Enter New Text:"), 0, 0);
-        gridPane.add(textField, 1, 0);
+        gridPane.add(textField, 1, 0, 2, 1);
 
         gridPane.add(new Label("Select Color:"), 0, 1);
         gridPane.add(redButton, 0, 2);
@@ -63,22 +68,43 @@ public class TextEditorApp extends Application {
         gridPane.add(new Label("Text Area:"), 1, 1);
         gridPane.add(textArea, 1, 2, 1, 3);
 
-        gridPane.add(new Label("Select Style:"), 2, 1);
-        gridPane.add(boldCheckBox, 2, 2);
-        gridPane.add(italicCheckBox, 2, 3);
-        gridPane.add(styleComboBox, 2, 4);
+        // Move the style selection to the right of the text area
+        VBox styleBox = new VBox(10);
+        styleBox.getChildren().addAll(new Label("Select Style:"), boldCheckBox, italicCheckBox, styleComboBox);
+        gridPane.add(styleBox, 2, 2, 1, 3); // Add the style box to the right of the text area
 
+        // Center the buttons
         VBox buttonBox = new VBox(10, processButton, clearButton);
+        buttonBox.setPadding(new Insets(10));
+        buttonBox.setStyle("-fx-alignment: center;");
         gridPane.add(buttonBox, 0, 5, 3, 1);
+
+        // Add borders around components
+        addBorders(gridPane);
 
         // BorderPane
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(gridPane);
+        borderPane.setStyle("-fx-background-color: #f0f0f0;");
+
+        // Add title to the top
+        Label titleLabel = new Label("Simple Text Editor");
+        titleLabel.setStyle("-fx-font-size: 24; -fx-font-weight: bold; -fx-padding: 10;");
+        borderPane.setTop(titleLabel);
 
         // Scene
         Scene scene = new Scene(borderPane, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void addBorders(GridPane gridPane) {
+        // Add borders to the gridPane
+        gridPane.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-padding: 10;");
+
+        // Add borders to the Text Field and Text Area
+        textField.setStyle("-fx-border-color: gray; -fx-border-width: 1;");
+        textArea.setStyle("-fx-border-color: gray; -fx-border-width: 1;");
     }
 
     private void processText() {
