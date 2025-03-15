@@ -8,7 +8,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class HelloApplication extends Application {
@@ -26,18 +25,15 @@ public class HelloApplication extends Application {
 
         // Create components
         textField = new TextField();
-        textField.setPrefWidth(250); // Decrease width
+        textField.setPrefWidth(250);
         textArea = new TextArea();
         textArea.setEditable(false);
-        textArea.setPrefWidth(250); // Decrease width
+        textArea.setPrefWidth(250);
         colorGroup = new ToggleGroup();
 
-        RadioButton redButton = new RadioButton("Red");
-        redButton.setToggleGroup(colorGroup);
-        RadioButton blueButton = new RadioButton("Blue");
-        blueButton.setToggleGroup(colorGroup);
-        RadioButton greenButton = new RadioButton("Green");
-        greenButton.setToggleGroup(colorGroup);
+        RadioButton redButton = createColorRadioButton("Red");
+        RadioButton blueButton = createColorRadioButton("Blue");
+        RadioButton greenButton = createColorRadioButton("Green");
 
         boldCheckBox = new CheckBox("Bold");
         italicCheckBox = new CheckBox("Italic");
@@ -59,50 +55,52 @@ public class HelloApplication extends Application {
 
         gridPane.add(new Label("Enter New Text:"), 0, 0);
         gridPane.add(textField, 1, 0, 2, 1);
-
         gridPane.add(new Label("Select Color:"), 0, 1);
         gridPane.add(redButton, 0, 2);
         gridPane.add(blueButton, 0, 3);
         gridPane.add(greenButton, 0, 4);
-
         gridPane.add(new Label("Text Area:"), 1, 1);
         gridPane.add(textArea, 1, 2, 1, 3);
 
-        // Move the style selection to the right of the text area
         VBox styleBox = new VBox(10);
         styleBox.getChildren().addAll(new Label("Select Style:"), boldCheckBox, italicCheckBox, styleComboBox);
-        gridPane.add(styleBox, 2, 2, 1, 3); // Add the style box to the right of the text area
+        gridPane.add(styleBox, 2, 2, 1, 3);
 
-        // Center the buttons
         VBox buttonBox = new VBox(10, processButton, clearButton);
         buttonBox.setPadding(new Insets(10));
         buttonBox.setStyle("-fx-alignment: center;");
         gridPane.add(buttonBox, 0, 5, 3, 1);
 
-        // Add borders around components
         addBorders(gridPane);
 
-        // BorderPane
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(gridPane);
         borderPane.setStyle("-fx-background-color: #f0f0f0;");
 
-        // Add title to the top
         Label titleLabel = new Label("Simple Text Editor");
         titleLabel.setStyle("-fx-font-size: 24; -fx-font-weight: bold; -fx-padding: 10;");
         borderPane.setTop(titleLabel);
 
-        // Scene
         Scene scene = new Scene(borderPane, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void addBorders(GridPane gridPane) {
-        // Add borders to the gridPane
-        gridPane.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-padding: 10;");
+    private RadioButton createColorRadioButton(String color) {
+        RadioButton radioButton = new RadioButton(color);
+        radioButton.setToggleGroup(colorGroup);
+        radioButton.setOnAction(event -> {
+            if (radioButton.isSelected()) {
+                radioButton.setStyle("-fx-background-color: " + color.toLowerCase() + ";");
+            } else {
+                radioButton.setStyle("-fx-background-color: transparent;");
+            }
+        });
+        return radioButton;
+    }
 
-        // Add borders to the Text Field and Text Area
+    private void addBorders(GridPane gridPane) {
+        gridPane.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-padding: 10;");
         textField.setStyle("-fx-border-color: gray; -fx-border-width: 1;");
         textArea.setStyle("-fx-border-color: gray; -fx-border-width: 1;");
     }
@@ -120,10 +118,10 @@ public class HelloApplication extends Application {
 
         // Style text
         String style = "-fx-font-weight: normal; -fx-font-style: normal;";
-        if (boldCheckBox.isSelected() || styleComboBox.getValue() != null && styleComboBox.getValue().contains("Bold")) {
+        if (boldCheckBox.isSelected() || (styleComboBox.getValue() != null && styleComboBox.getValue().contains("Bold"))) {
             style = "-fx-font-weight: bold;";
         }
-        if (italicCheckBox.isSelected() || styleComboBox.getValue() != null && styleComboBox.getValue().contains("Italic")) {
+        if (italicCheckBox.isSelected() || (styleComboBox.getValue() != null && styleComboBox.getValue().contains("Italic"))) {
             style += "-fx-font-style: italic;";
         }
 
